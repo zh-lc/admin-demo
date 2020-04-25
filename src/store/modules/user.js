@@ -3,6 +3,8 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 import { constantRoutes, asyncRoutes } from '@/router/routers'
+import { deepClone } from '@/utils'
+import path from 'path'
 
 const getDefaultState = () => {
   return {
@@ -12,6 +14,24 @@ const getDefaultState = () => {
     roles: [],
     routes: []
   }
+}
+
+const generateTree = (routes, basePath = '/', checkedKeys) => { // 根据后台传回的权限解析成路由 routes 是路由配置文件  checkedKeys 后台传回的数据 是素组
+  const res = []
+
+  for (const route of routes) {
+    const routePath = path.resolve(basePath, route.path)
+
+    // recursive child routes
+    if (route.children) {
+      route.children = generateTree(route.children, routePath, checkedKeys)
+    }
+
+    if (checkedKeys.includes(routePath) || (route.children && route.children.length >= 1)) {
+      res.push(route)
+    }
+  }
+  return res
 }
 
 const state = getDefaultState()
@@ -29,9 +49,11 @@ const mutations = {
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
+  SET_ROUTES: (state, routes) => {
+    state.routes = [...constantRoutes, ...routes]
+  },
   SET_ROLES: (state, roles) => {
     state.roles = roles
-    state.routes = [...constantRoutes, ...roles]
   }
 }
 
@@ -54,25 +76,15 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      // getInfo(state.token).then(response => {
-      //   const { data } = response
-
-      //   if (!data) {
-      //     reject('Verification failed, please Login again.')
-      //   }
-
-      //   const { name, avatar } = data
-
-      //   commit('SET_NAME', name)
-      //   commit('SET_AVATAR', avatar)
-      //   resolve(data)
-      // }).catch(error => {
-      //   reject(error)
-      // })
-      // commit('SET_ROLES', asyncRoutes)
-      // resolve(asyncRoutes)
-      commit('SET_ROLES', [])
-      resolve([])
+      const roles = JSON.parse(window.localStorage.rols)
+      // console.log(rols)
+      const routers = generateTree(deepClone(asyncRoutes), '/', roles)
+      commit('SET_NAME', 'name')
+      commit('SET_ROLES', roles)
+      commit('SET_ROUTES', routers)
+      resolve(routers)
+      // commit('SET_ROLES', [])
+      // resolve([])
     })
   },
 
