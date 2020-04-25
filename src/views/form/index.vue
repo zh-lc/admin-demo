@@ -46,7 +46,7 @@
     </el-form>
 
     <!-- 测试按钮权限 -->
-    <el-button v-permission="'del'">增加</el-button>
+    <el-button v-permission="'add'">增加</el-button>
   </div>
 </template>
 
