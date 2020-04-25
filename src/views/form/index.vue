@@ -44,6 +44,9 @@
         <el-button @click="onCancel">Cancel</el-button>
       </el-form-item>
     </el-form>
+
+    <!-- 测试按钮权限 -->
+    <el-button v-permission="'del'">增加</el-button>
   </div>
 </template>
 
@@ -62,6 +65,9 @@ export default {
         desc: ''
       }
     }
+  },
+  created() {
+    console.log(this.$route)
   },
   methods: {
     onSubmit() {

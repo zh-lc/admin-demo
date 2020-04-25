@@ -144,7 +144,7 @@ export const asyncRoutes = [
         meta: {
           title: 'Form',
           icon: 'form',
-          roles: ['admin'] // or you can only set roles in sub nav
+          roles: ['add', 'del', 'select'] // or you can only set roles in sub nav
         }
       }
     ]

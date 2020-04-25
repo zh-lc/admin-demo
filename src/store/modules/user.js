@@ -76,9 +76,19 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      const roles = JSON.parse(window.localStorage.rols)
-      // console.log(rols)
-      const routers = generateTree(deepClone(asyncRoutes), '/', roles)
+      const roles = window.localStorage.rols ? JSON.parse(window.localStorage.rols) : []
+      const filter_page = []
+      let roles_page = roles.filter(item => {
+        if (item.includes('-')) {
+          filter_page.push(item.split('-')[0])
+          return false
+        }
+        return true
+      })
+      roles_page = Array.from(new Set([...roles_page, ...filter_page]))
+      console.log(roles_page)
+      console.log(filter_page)
+      const routers = generateTree(deepClone(asyncRoutes), '/', roles_page)
       commit('SET_NAME', 'name')
       commit('SET_ROLES', roles)
       commit('SET_ROUTES', routers)
